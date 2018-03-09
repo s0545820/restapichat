@@ -1,6 +1,7 @@
 require('dotenv').config()
 var express = require('express');
 var app = express();
+var fs = require('fs');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var User = require('./models/User');
@@ -39,6 +40,14 @@ app.use('/api', index);
 app.use('/api/users', users);
 app.use('/chat', chat);
 
+var log = function(msg) {
+  fs.writeFile("chat.txt", msg, function(err) {
+      if(err) {
+          return console.log(err);
+      }
+  });
+};
+
 
 
               /***CHAT***/
@@ -57,10 +66,12 @@ io.on('connection', function(socket){
   });
   socket.on('chat message', function(msg){
     io.emit('recieveMessage', msg);
+    log(new Date() + ' : ' + msg.from + ': ' + msg.msg);
   });
   socket.on('private-message', function(data) {
     socket.to(data.socketid).emit('recieveMessage', data.msg);
     socket.emit('recieveMessage', data.msg);
+    log(new Date() + ' : ' + msg.from + ' > ' + msg.to + ': ' + msg.msg);
   });
   socket.on('joined', function(user) {
     var set = true;
