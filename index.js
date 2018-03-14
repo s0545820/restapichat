@@ -12,8 +12,8 @@ var io = require('socket.io')(http);
 
 
 //setting up mongoose
-
-mongoose.connect('mongodb://localhost:27017/chat');
+var mongourl = 'mongodb://' + process.env.MONGOUSER + ':' + process.env.MONGOPW + '@ds111319.mlab.com:11319/chat';
+mongoose.connect(mongourl);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
@@ -41,7 +41,11 @@ app.use('/api/users', users);
 app.use('/chat', chat);
 
 var log = function(msg) {
-  fs.writeFile("chat.txt", msg, function(err) {
+  var date = new Date();
+  var from = msg.from;
+  var message = msg.msg;
+  var all = date + ' : "' + from + ': ' + message + '"';
+  fs.writeFile("chat.txt", all, function(err) {
       if(err) {
           return console.log(err);
       }
@@ -66,12 +70,12 @@ io.on('connection', function(socket){
   });
   socket.on('chat message', function(msg){
     io.emit('recieveMessage', msg);
-    log(new Date() + ' : ' + msg.from + ': ' + msg.msg);
+    log(msg);
   });
   socket.on('private-message', function(data) {
     socket.to(data.socketid).emit('recieveMessage', data.msg);
     socket.emit('recieveMessage', data.msg);
-    log(new Date() + ' : ' + msg.from + ' > ' + msg.to + ': ' + msg.msg);
+    log(data.msg);
   });
   socket.on('joined', function(user) {
     var set = true;

@@ -230,6 +230,12 @@ router.post('/refreshtoken', function(req, res) {
   });
 });
 
+router.get('auth/facebook', function(req, res) {
+  //Get the access token and user object from request
+  //Verificate the access token by sending it to facebook endpoint graph.facebook.com/me
+  // create the user with isVerified:true on the CLient
+  //Generate a JWT and send it back to Client
+});
 
 //TODOCHANGE PASSWORD
 
