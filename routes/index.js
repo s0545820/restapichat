@@ -151,9 +151,15 @@ router.post('/verify', function(req, res) {
   var token = req.headers['x-access-token'];
   if (!token) res.status(401).json({message:'No token provided.'});
   jwt.verify (token, process.env.SECRET, function (err, decoded) {
-    if(err) res.status(500).json({message: err.message});
+    if(err) {
+      res.status(500).json({message: err.message});
+      console.log('error in jwt verify: '+err);
+    }
     User.findOne({_id: decoded.user_id}, {password: 0}, function(err, user) {
-      if(err) res.status(500).json({message: 'Problem occured while finding the user.'});
+      if(err) {
+        res.status(500).json({message: 'Problem occured while finding the user.'});
+                          console.log('error in user findone: '+err);
+      }
       if(!user) {
         res.status(404).json({message: 'No user found'});
       } else {
@@ -176,12 +182,14 @@ router.post('/verify', function(req, res) {
           };
           transporter.sendMail(mailOptions, function(error, info){
               if(error){
+                  console.log('error in sendmail: '+error);
                   res.status(500).json({error: error});
               } else {
                 user.verifyToken = enc;
                 user.verifyTokenExpires = Date.now() + 86400000;
                 user.save(function(err, updated_user) {
                   if (err) res.status(500).json({message: err.message});
+                  console.log('error in user save: '+err);
                   res.status(200).json({message: 'Email sent to ' + user.email});
                 });
               }
