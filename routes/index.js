@@ -245,7 +245,11 @@ router.post('/sociallogin', function(req, res) {
   axios.get('https://graph.facebook.com/me?fields=first_name,email,picture.type'+'(large)'+'&access_token='+access_token).then(function(response) {
     var reftoken = jwt.sign({user_data: response.data, social:true}, process.env.SECRET, {expiresIn: '60d'});
     var token = jwt.sign({user_data: response.data, isVerified: true, social: true}, process.env.SECRET, {expiresIn: '1h'});
-    var user = {name: response.data.first_name, picture: response.data.picture, email: response.data.email};
+        /***isVerified should be response.data.verified, but for test app like this its not important.
+            If user is not verified on fb, dont show the verify btn on front end, just say
+            that he needs to verify his fb/google/etc account first. (Just make 2 diff views for social true
+            and false users)***/
+    var user = {name: response.data.first_name, picture: response.data.picture, email: response.data.email, isVerified: true, social: true};
     res.status(200).json({jwt_token: token, refresh_token: reftoken, user: user});
   })
   .catch(function(error) {
