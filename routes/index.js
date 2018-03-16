@@ -1,6 +1,7 @@
 var router = require('express').Router();
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
+var axios = require('axios');
 var crypto = require('crypto');
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
@@ -153,12 +154,10 @@ router.post('/verify', function(req, res) {
   jwt.verify (token, process.env.SECRET, function (err, decoded) {
     if(err) {
       res.status(500).json({message: err.message});
-      console.log('error in jwt verify: '+err);
     }
     User.findOne({_id: decoded.user_id}, {password: 0}, function(err, user) {
       if(err) {
         res.status(500).json({message: 'Problem occured while finding the user.'});
-                          console.log('error in user findone: '+err);
       }
       if(!user) {
         res.status(404).json({message: 'No user found'});
@@ -182,14 +181,12 @@ router.post('/verify', function(req, res) {
           };
           transporter.sendMail(mailOptions, function(error, info){
               if(error){
-                  console.log('error in sendmail: '+error);
                   res.status(500).json({error: error});
               } else {
                 user.verifyToken = enc;
                 user.verifyTokenExpires = Date.now() + 86400000;
                 user.save(function(err, updated_user) {
                   if (err) res.status(500).json({message: err.message});
-                  console.log('error in user save: '+err);
                   res.status(200).json({message: 'Email sent to ' + user.email});
                 });
               }
@@ -226,23 +223,34 @@ router.post('/refreshtoken', function(req, res) {
   if (!token) res.status(401).json({message:'No token provided'});
   jwt.verify(token, process.env.SECRET, function (err, decoded) {
     if(err) res.status(500).json({message: err.message});
-    User.findOne({_id: decoded.user_id}, {password: 0}, function(err, user) {
-      if(err) res.status(500).json({message: err.message});
-      if(!user) {
-        res.status(404).json({message: 'No user found'});
-      } else {
-        var token = jwt.sign({user_id: user._id, email: user.email, username: user.username}, process.env.SECRET, {expiresIn: '1h'});
-        res.status(200).json({jwt_token: token});
-      }
-    });
+    if(decoded.social) {
+      var token = jwt.sign({user: decoded.user_data, isVerified: decoded.isVerified}, process.env.SECRET, {expiresIn: '1h'});
+      res.status(200).json({jwt_token: token});
+    } else {
+      User.findOne({_id: decoded.user_id}, {password: 0}, function(err, user) {
+        if(err) res.status(500).json({message: err.message});
+        if(!user) {
+          res.status(404).json({message: 'No user found'});
+        } else {
+          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username}, process.env.SECRET, {expiresIn: '1h'});
+          res.status(200).json({jwt_token: token});
+        }
+      });
+    }
   });
 });
 
-router.get('auth/facebook', function(req, res) {
-  //Get the access token and user object from request
-  //Verificate the access token by sending it to facebook endpoint graph.facebook.com/me
-  // create the user with isVerified:true on the CLient
-  //Generate a JWT and send it back to Client
+router.post('/sociallogin', function(req, res) {
+  var access_token = req.body.access_token;
+  axios.get('https://graph.facebook.com/me?fields=first_name,email,picture.type'+'(large)'+'&access_token='+access_token).then(function(response) {
+    var reftoken = jwt.sign({user_data: response.data, social:true}, process.env.SECRET, {expiresIn: '60d'});
+    var token = jwt.sign({user_data: response.data, isVerified: true, social: true}, process.env.SECRET, {expiresIn: '1h'});
+    var user = {name: response.data.first_name, picture: response.data.picture, email: response.data.email};
+    res.status(200).json({jwt_token: token, refresh_token: reftoken, user: user});
+  })
+  .catch(function(error) {
+    res.status(404).json({error:error.response.data.error.message});
+  });
 });
 
 //TODOCHANGE PASSWORD
