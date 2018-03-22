@@ -101,6 +101,9 @@ io.on('connection', function(socket){
     }
     console.log(connected_users);
   });
+  socket.on('kick', function(socketid) {
+    socket.to(socketid).emit('kicked');
+  });
 });
 
 
