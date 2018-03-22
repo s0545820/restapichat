@@ -250,7 +250,7 @@ router.post('/sociallogin', function(req, res) {
             If user is not verified on fb, dont show the verify btn on front end, just say
             that he needs to verify his fb/google/etc account first. (Just make 2 diff views for social true
             )***/
-    var user = {name: response.data.first_name, picture: response.data.picture, email: response.data.email, isVerified: true, social: true};
+    var user = {username: response.data.first_name, picture: response.data.picture, email: response.data.email, isVerified: true, social: true};
     res.status(200).json({jwt_token: token, refresh_token: reftoken, user: user});
   })
   .catch(function(error) {
