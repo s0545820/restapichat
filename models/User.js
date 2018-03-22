@@ -25,6 +25,7 @@ var UserSchema = new Schema({
   socketid: {
     type: String
   },
+  role: String,
   resetPasswordToken: String,
   resetPasswordExpires: Date,
   verifyToken: String,

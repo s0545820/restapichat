@@ -40,13 +40,14 @@ router.post('/register', function(req, res) {
                   User.create({
                     username: req.body.username,
                     email: req.body.email,
-                    password: hashedPassword
+                    password: hashedPassword,
+                    role: 'user'
                   }, function(err, user) {
                     if(err) {
                       res.status(500).json({message: 'Registration failed'});
                     } else {
                       var reftoken = jwt.sign({user_id: user._id}, process.env.SECRET, {expiresIn: '60d'});
-                      var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified}, process.env.SECRET, {expiresIn: '1h'});
+                      var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role}, process.env.SECRET, {expiresIn: '1h'});
                       //sendVerifyEmail(req.headers.origin, user);
                       res.status(200).json({auth: true, jwt_token: token, refresh_token: reftoken});
                     };
@@ -72,7 +73,7 @@ router.post('/login', function(req, res) {
           res.status(401).json({message:'Wrong Password.'});
         } else {
           var reftoken = jwt.sign({user_id: user._id}, process.env.SECRET, {expiresIn: '60d'});
-          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified}, process.env.SECRET, {expiresIn: '1h'});
+          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role}, process.env.SECRET, {expiresIn: '1h'});
           res.status(200).json({jwt_token: token, refresh_token: reftoken, auth: true});
         }
       });
@@ -248,8 +249,8 @@ router.post('/sociallogin', function(req, res) {
         /***isVerified should be response.data.verified, but for test app like this its not important.
             If user is not verified on fb, dont show the verify btn on front end, just say
             that he needs to verify his fb/google/etc account first. (Just make 2 diff views for social true
-            and false users)***/
-    var user = {username: response.data.first_name, picture: response.data.picture, email: response.data.email, isVerified: true, social: true};
+            )***/
+    var user = {name: response.data.first_name, picture: response.data.picture, email: response.data.email, isVerified: true, social: true};
     res.status(200).json({jwt_token: token, refresh_token: reftoken, user: user});
   })
   .catch(function(error) {

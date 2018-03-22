@@ -21,18 +21,7 @@ router.get('/online', function(req, res) {
 });
 
 router.get('/', function(req, res) {
-  /*var io = require('socket.io')(http);
-  io.emit("customEmit", 'hey');
-  io.on('connection', function(socket) {
-    socket.emit("customEmit", 'hey');
-    console.log('a user connected');
-    socket.on('message', function(data) {
-      socket.emit('message', data)
-    });
-    socket.on('private-message', function(data) {
-      socket.to(data.socketid).emit('private-message', data.message);
-    });
-  });*/
+
 });
 
 module.exports = router;
