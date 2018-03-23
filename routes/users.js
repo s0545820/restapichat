@@ -90,7 +90,7 @@ router.get('/', function(req, res) {
       if (!users)
           res.status(401).json({message: 'No users.'});
       for(user in users) {
-          if(user.banned) {
+          if(user.banned == true) {
             us.push(user);
           }
         }
