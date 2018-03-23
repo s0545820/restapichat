@@ -94,7 +94,7 @@ router.get('/', function(req, res) {
             us.push(user);
           }
         }
-      res.status(200).json({users: banned_users});
+      res.status(200).json({users: us});
       //res.status(200).json({users: users});
     });
   });
