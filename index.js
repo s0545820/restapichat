@@ -104,6 +104,9 @@ io.on('connection', function(socket){
   socket.on('kick', function(socketid) {
     socket.to(socketid).emit('kicked');
   });
+  socket.on('ban', function(socketid) {
+    socket.to(socketid).emit('banned');
+  });
 });
 
 

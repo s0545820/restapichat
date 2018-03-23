@@ -26,6 +26,7 @@ var UserSchema = new Schema({
     type: String
   },
   role: String,
+  banned: false
   resetPasswordToken: String,
   resetPasswordExpires: Date,
   verifyToken: String,

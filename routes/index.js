@@ -47,7 +47,7 @@ router.post('/register', function(req, res) {
                       res.status(500).json({message: 'Registration failed'});
                     } else {
                       var reftoken = jwt.sign({user_id: user._id}, process.env.SECRET, {expiresIn: '60d'});
-                      var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role}, process.env.SECRET, {expiresIn: '1h'});
+                      var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role, banned: user.banned}, process.env.SECRET, {expiresIn: '1h'});
                       //sendVerifyEmail(req.headers.origin, user);
                       res.status(200).json({auth: true, jwt_token: token, refresh_token: reftoken});
                     };
@@ -73,7 +73,7 @@ router.post('/login', function(req, res) {
           res.status(401).json({message:'Wrong Password.'});
         } else {
           var reftoken = jwt.sign({user_id: user._id}, process.env.SECRET, {expiresIn: '60d'});
-          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role}, process.env.SECRET, {expiresIn: '1h'});
+          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role, banned: user.banned}, process.env.SECRET, {expiresIn: '1h'});
           res.status(200).json({jwt_token: token, refresh_token: reftoken, auth: true});
         }
       });
