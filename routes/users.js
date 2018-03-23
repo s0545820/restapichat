@@ -127,21 +127,25 @@ router.post('/ban', function(req,res) {
 router.post('/unban', function(req,res) {
 
 });
-/*router.get('/banned', function(req,res) {
+router.get('/banned', function(req,res) {
   var token = req.headers['x-access-token'];
   if (!token) res.status(401).json({message:'Not authenticated. Please log in.'});
   jwt.verify(token, process.env.SECRET, function (err, decoded) {
     if(err) res.status(500).json({message: err.message});
     if(decoded.role == 'admin') {
-      User.find({banned: true}, function(err, users) {
+      User.find({'banned': true}, function(err, users) {
         if (err)
             res.status(500).json({message: err.message});
-        if (!users)
+        if (!users) {
             res.status(401).json({message: 'No banned users.'});
-        res.status(200).json({users: users});
+        } else {
+
+          res.status(200).json({users: users});
+        }
+
       });
     }
   });
-});*/
+});
 
 module.exports = router;
