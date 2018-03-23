@@ -88,7 +88,7 @@ router.get('/', function(req, res) {
           res.status(500).json({message: err.message});
       if (!users)
           res.status(401).json({message: 'No users.'});
-      res.status(200).json({users: us});
+      res.status(200).json({users: users});
     });
   });
 });
