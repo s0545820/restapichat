@@ -83,11 +83,11 @@ router.get('/', function(req, res) {
   if (!token) res.status(401).json({message:'Not authenticated. Please log in.'});
   jwt.verify(token, process.env.SECRET, function (err, decoded) {
     if(err) res.status(500).json({message: err.message});
-    User.find({status: 1}, function(err, users) {
+    User.find({}, function(err, users) {
       if (err)
           res.status(500).json({message: err.message});
       if (!users)
-          res.status(401).json({message: 'No online users.'});
+          res.status(401).json({message: 'No users.'});
       res.status(200).json({users: users});
     });
   });
