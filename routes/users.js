@@ -140,12 +140,7 @@ router.get('/banned', function(req,res) {
         if (!users) {
             res.status(401).json({message: 'No banned users.'});
         } else {
-          for(user in users) {
-            if(user.banned) {
-              banned_users.push(user);
-            }
-          }
-          res.status(200).json({users: banned_users});
+          res.json({users: users});
         }
       });
     }
