@@ -79,6 +79,7 @@ router.put('/status', function(req, res) {
 });
 
 router.get('/', function(req, res) {
+  var us = [];
   var token = req.headers['x-access-token'];
   if (!token) res.status(401).json({message:'Not authenticated. Please log in.'});
   jwt.verify(token, process.env.SECRET, function (err, decoded) {
@@ -88,7 +89,13 @@ router.get('/', function(req, res) {
           res.status(500).json({message: err.message});
       if (!users)
           res.status(401).json({message: 'No users.'});
-      res.status(200).json({users: users});
+      for(user in users) {
+          if(user.banned) {
+            us.push(user);
+          }
+        }
+      res.status(200).json({users: banned_users});
+      //res.status(200).json({users: users});
     });
   });
 });
@@ -140,7 +147,12 @@ router.get('/banned', function(req,res) {
         if (!users) {
             res.status(401).json({message: 'No banned users.'});
         } else {
-          res.json({users: users});
+          for(user in users) {
+            if(user.banned) {
+              banned_users.push(user);
+            }
+          }
+          res.status(200).json({users: banned_users});
         }
       });
     }
