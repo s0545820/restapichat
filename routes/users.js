@@ -132,13 +132,20 @@ router.get('/banned', function(req,res) {
   if (!token) res.status(401).json({message:'Not authenticated. Please log in.'});
   jwt.verify(token, process.env.SECRET, function (err, decoded) {
     if(err) res.status(500).json({message: err.message});
-    User.find({banned: true}, function(err, users) {
-      if (err)
-          res.status(500).json({message: err.message});
-      if (!users)
-          res.status(401).json({message: 'No banned users.'});
+    if(decoded.role == 'admin') {
+    /*  User.find({banned: true}, function(err, users) {
+        if (err)
+            res.status(500).json({message: err.message});
+        if (!users)
+            res.status(401).json({message: 'No banned users.'});
+        res.status(200).json({users: users});
+      });*/
+      var users = [
+        {username: 'max'},
+        {username: 'mex'}
+      ]
       res.status(200).json({users: users});
-    });
+    }
   });
 });
 

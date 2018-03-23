@@ -233,7 +233,7 @@ router.post('/refreshtoken', function(req, res) {
         if(!user) {
           res.status(404).json({message: 'No user found'});
         } else {
-          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username}, process.env.SECRET, {expiresIn: '1h'});
+          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role, banned: user.banned}, process.env.SECRET, {expiresIn: '1h'});
           res.status(200).json({jwt_token: token});
         }
       });
