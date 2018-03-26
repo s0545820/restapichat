@@ -107,11 +107,11 @@ io.on('connection', function(socket){
   socket.on('ban', function(socketid) {
     socket.to(socketid).emit('banned');
   });
-  socket.on('join room', function(room) {
+  socket.on('joinroom', function(room) {
     socket.join(room);
   });
-  socket.on('room message', function(room) {
-    io.to(room).emit('room message', 'hey');
+  socket.on('roommessage', function(room) {
+    io.to(room).emit('roommessage', 'hey');
   });
 });
 
