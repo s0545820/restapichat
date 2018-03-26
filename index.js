@@ -109,12 +109,11 @@ io.on('connection', function(socket){
   });
   socket.on('join room', function(room) {
     socket.join(room);
-  })
-  socket.on('send room', function(room) {
-    io.to(room).emit('msg', 'hey');
-  })
+  });
+  socket.on('room message', function(room) {
+    io.to(room).emit('room message', 'hey');
+  });
 });
-io.to('room1').emit('msg', 'hey');
 
 
 
