@@ -107,6 +107,12 @@ io.on('connection', function(socket){
   socket.on('ban', function(socketid) {
     socket.to(socketid).emit('banned');
   });
+  socket.on('join room', function(room) {
+    socket.join(room);
+  })
+  socket.on('send room', function(room) {
+    socket.to(room).emit('msg', 'hey');
+  })
 });
 
 
