@@ -42,7 +42,8 @@ router.post('/register', function(req, res) {
                     email: req.body.email,
                     password: hashedPassword,
                     role: 'user',
-                    url: req.body.url
+                    //url: req.body.url,
+                    url: 'http://lorempixel.com/200/200/'
                   }, function(err, user) {
                     if(err) {
                       res.status(500).json({message: 'Registration failed'});
