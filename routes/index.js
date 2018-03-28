@@ -41,15 +41,15 @@ router.post('/register', function(req, res) {
                     username: req.body.username,
                     email: req.body.email,
                     password: hashedPassword,
-                    role: 'user'
+                    role: 'user',
+                    picture.url: req.body.url
                   }, function(err, user) {
                     if(err) {
                       res.status(500).json({message: 'Registration failed'});
                     } else {
                       var reftoken = jwt.sign({user_id: user._id}, process.env.SECRET, {expiresIn: '60d'});
-                      var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role, banned: user.banned}, process.env.SECRET, {expiresIn: '1h'});
-                      //sendVerifyEmail(req.headers.origin, user);
-                      res.status(200).json({auth: true, jwt_token: token, refresh_token: reftoken});
+                      var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role, banned: user.banned, url: user.picture.url}, process.env.SECRET, {expiresIn: '1h'});
+                      res.status(200).json({jwt_token: token, refresh_token: reftoken});
                     };
                   });
                 };
@@ -73,8 +73,8 @@ router.post('/login', function(req, res) {
           res.status(401).json({message:'Wrong Password.'});
         } else {
           var reftoken = jwt.sign({user_id: user._id}, process.env.SECRET, {expiresIn: '60d'});
-          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role, banned: user.banned}, process.env.SECRET, {expiresIn: '1h'});
-          res.status(200).json({jwt_token: token, refresh_token: reftoken, auth: true});
+          var token = jwt.sign({user_id: user._id, email: user.email, username: user.username, isVerified: user.isVerified, role: user.role, banned: user.banned, url: user.picture.url}, process.env.SECRET, {expiresIn: '1h'});
+          res.status(200).json({jwt_token: token, refresh_token: reftoken});
         }
       });
     };
@@ -243,15 +243,23 @@ router.post('/refreshtoken', function(req, res) {
 
 router.post('/sociallogin', function(req, res) {
   var access_token = req.body.access_token;
-  axios.get('https://graph.facebook.com/me?fields=first_name,email,picture.type'+'(large)'+'&access_token='+access_token).then(function(response) {
+  axios.get('https://graph.facebook.com/me?fields=birthday,gender,first_name,email,picture.type'+'(large)'+'&access_token='+access_token).then(function(response) {
     var reftoken = jwt.sign({user_data: response.data, social:true}, process.env.SECRET, {expiresIn: '60d'});
     var token = jwt.sign({user_data: response.data, isVerified: true, social: true}, process.env.SECRET, {expiresIn: '1h'});
-        /***isVerified should be response.data.verified, but for test app like this its not important.
-            If user is not verified on fb, dont show the verify btn on front end, just say
-            that he needs to verify his fb/google/etc account first. (Just make 2 diff views for social true
-            )***/
     var user = {username: response.data.first_name, picture: response.data.picture, email: response.data.email, isVerified: true, social: true};
     res.status(200).json({jwt_token: token, refresh_token: reftoken, user: user});
+    /*User.findOne({facebook_id: response.data.id}, function(err, user) {
+      if(err) res.status(500).json({message: err.message});
+      if(!user) {
+
+      } else {
+        var reftoken = jwt.sign({user_data: response.data, social:true}, process.env.SECRET, {expiresIn: '60d'});
+        var token = jwt.sign({user_data: response.data, isVerified: true, social: true}, process.env.SECRET, {expiresIn: '1h'});
+        var user = {username: response.data.first_name, picture: response.data.picture, email: response.data.email, isVerified: true, social: true};
+        res.status(200).json({jwt_token: token, refresh_token: reftoken, user: user});
+      }
+    });*/
+
   })
   .catch(function(error) {
     res.status(404).json({error:error.response.data.error.message});

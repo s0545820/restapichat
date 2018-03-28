@@ -18,12 +18,9 @@ var UserSchema = new Schema({
     type: Boolean,
     default: false
   },
-  status: {
-    type: Number,
-    default: 0
-  },
-  socketid: {
-    type: String
+
+  picture {
+    url: String
   },
   role: String,
   banned: false,
