@@ -18,12 +18,7 @@ var UserSchema = new Schema({
     type: Boolean,
     default: false
   },
-
-  picture: {
-    url: {
-      type: String
-    }
-  },
+  url: String,
   role: String,
   banned: false,
   resetPasswordToken: String,
