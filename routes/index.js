@@ -42,7 +42,7 @@ router.post('/register', function(req, res) {
                     email: req.body.email,
                     password: hashedPassword,
                     role: 'user',
-                    picture.url: req.body.url
+                    url: req.body.url
                   }, function(err, user) {
                     if(err) {
                       res.status(500).json({message: 'Registration failed'});
