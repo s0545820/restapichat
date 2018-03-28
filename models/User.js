@@ -20,7 +20,9 @@ var UserSchema = new Schema({
   },
 
   picture: {
-    url: String
+    url: {
+      type: String
+    }
   },
   role: String,
   banned: false,
