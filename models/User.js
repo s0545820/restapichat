@@ -19,7 +19,7 @@ var UserSchema = new Schema({
     default: false
   },
 
-  picture {
+  picture: {
     url: String
   },
   role: String,
