@@ -107,12 +107,28 @@ io.on('connection', function(socket){
   socket.on('ban', function(socketid) {
     socket.to(socketid).emit('banned');
   });
-  socket.on('joinroom', function(room) {
-    socket.join(room);
+  //GAME EVENTS
+  socket.on('gameinvite', function(data) {
+    //send your own socketid too
+    let challenger = {
+      socket_id: socket.id,
+      username: data.username
+    };
+    socket.to(data.socketid).broadcast.emit('gameinvite', challenger);
   });
-  socket.on('roommessage', function(room) {
-    io.to(room).emit('roommessage', 'hey');
+  socket.on('gameaccepted', function(socketid) {
+    socket.to(socketid).emit('gamestarted');
   });
+  socket.on('gamedenied', function(socketid) {
+    socket.to(socketid).broadcast.emit('gamedenied');
+  });
+  socket.on('maketurn', function(data) {
+    socket.to(data.socketid).broadcast.emit('madeturn', socket.id);
+  });
+  socket.on('gamewon', function(socketid) {
+    socket.to(socketid).emit('gamewon', socket.id);
+  });
+
 });
 
 
